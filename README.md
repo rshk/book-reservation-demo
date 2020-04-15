@@ -1,4 +1,4 @@
-# Your new MoWAKi Project
+# Book reservation service
 
 Application created with [MoWAKi].
 
