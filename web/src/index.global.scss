@@ -1,0 +1,36 @@
+/*********************************************************************
+
+    Global CSS main entry-point.
+
+    This should be used to load global styles, eg. base font size /
+    color, styling for HTML elements, etc.
+
+    It's also a good place to load your libraries (eg. Bootstrap) and
+    fonts.
+
+*********************************************************************/
+
+
+/* Reset CSS rules
+ * Not needed when using bootstrap
+ ********************************************************************/
+
+// @import './reset';
+
+
+/* Load customized bootstrap
+ ********************************************************************/
+
+@import "~style/index";
+
+
+/* Use "border-box" box sizing by default
+********************************************************************/
+
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}

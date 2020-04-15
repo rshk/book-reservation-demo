@@ -1,0 +1,71 @@
+version: '3.4'
+services:
+
+  api:
+    image: mowaki-app-apiserver-dev:py3.7
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: mowaki-app-apiserver-dev
+      args:
+        PYTHON_VERSION: "3.7"
+    volumes:
+      - type: bind
+        source: .
+        target: /src/api
+    ports:
+      - "127.0.0.1:${API_PORT:-5000}:5000"
+    environment:
+      SECRET_KEY:
+      PYTHONPATH: /src/api
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@database:5432/default
+      REDIS_URL: redis://redis:6379
+
+  web:
+
+    # NOTE: dependencies are installed in their own volume, so we can
+    # "shadow" the local node_modules folder.
+    # This is most useful to allow switching between locally-installed
+    # and docker-installed nodejs.
+    #
+    # To install dependencies, run:
+    #
+    # docker-compose run --entrypoint='' --rm --no-deps web npm install
+
+    image: node:10
+    volumes:
+      - ./web:/src/web
+      - nodemodules:/src/web/node_modules
+    working_dir: /src/web
+    command: >-
+      /src/web/node_modules/.bin/webpack-dev-server
+      --mode development --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8000}:8000"
+    environment:
+      SERVER_HOST: '0.0.0.0'
+      API_URL: 'http://localhost:${API_PORT:-5000}/graphql'
+
+  database:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: 'default'
+    volumes:
+      - db-pgdata:/var/lib/postgresql/data
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+
+  redis:
+    image: redis:4
+    volumes:
+      - redis-data:/data
+    # ports:
+    #   - "127.0.0.1:6379:6379"
+
+
+volumes:
+  db-pgdata:
+  redis-data:
+  nodemodules:
