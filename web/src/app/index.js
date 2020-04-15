@@ -7,6 +7,8 @@ import ApolloProvider from 'lib/apollo-provider';
 import Layout from 'app/ui/layout';
 import { ICON } from 'app/config';
 
+import RequestsListPage from 'app/ui/requests-list-page';
+
 
 export default function App() {
     return <React.Fragment>
@@ -26,7 +28,7 @@ export default function App() {
 function AppRoutes() {
     return <Switch>
 
-        <Route exact path="/" component={IndexPage} />
+        <Route exact path="/" component={RequestsListPage} />
         <Route path="/new" component={NewRequestPage} />
         <Route path="/request/:id"
                render={({match: {params: {id}}}) =>
@@ -34,13 +36,6 @@ function AppRoutes() {
         <Redirect to="/" />
 
     </Switch>;
-}
-
-
-function IndexPage() {
-    return <Layout>
-        Hello
-    </Layout>;
 }
 
 function NewRequestPage() {
