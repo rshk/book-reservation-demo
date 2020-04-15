@@ -51,6 +51,7 @@ function NewRequestPageWrapper(props) {
 function RequestPageWrapper(props) {
     const {match: {params: {requestId}}} = props;
     return <Layout>
-        Hello
+        <h1>Request {requestId}</h1>
+        <div>We can have an update form here, for example</div>
     </Layout>;
 }
