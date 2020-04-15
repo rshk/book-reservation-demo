@@ -26,6 +26,11 @@ BookRequest = Object('BookRequest', {
 })
 
 
+@BookRequest.field('timestamp')
+def resolve_book_request_timestamp(root, info) -> datetime:
+    return root.date_created
+
+
 @schema.query.field('requests')
 def resolve_list_requests(root, info) -> List[BookRequest]:
     core = LibraryCore.from_request()
@@ -82,7 +87,7 @@ DeleteRequestOutput = Object('DeleteRequestOutput', {
 def resolve_delete_request(root, info, id: int) -> DeleteRequestOutput:
     core = LibraryCore.from_request()
     request = core.get_request(id)
-    core.delete(request)
+    core.delete_request(request)
     return DeleteRequestOutput(ok=True)
 
 
