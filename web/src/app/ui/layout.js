@@ -33,9 +33,6 @@ export default function Layout({children}) {
                     email
                     displayName
                     imageUrl
-                    isSuperuser
-                    canAdminUsers
-                    canAdminTrips
                 }
             }
         }

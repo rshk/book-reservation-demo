@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, ListGroup, ListGroupItem, Button } from 'reactstrap';
+import { DateTime } from 'luxon';
+import qs from 'querystring';
 
 import Layout from 'app/ui/layout';
 
@@ -31,7 +33,8 @@ function RequestsList() {
         }
     `;
 
-    const { loading, error, data } = useQuery(query);
+    const { loading, error, data, refetch } =
+        useQuery(query, {fetchPolicy: 'cache-and-network'});
 
     if (loading) {
         return <div>Loading requests...</div>;
@@ -49,19 +52,23 @@ function RequestsList() {
         </div>;
     }
 
-    return <RequestsListUI requests={data.requests} />;
+    return <RequestsListUI requests={data.requests} refetch={refetch} />;
 }
 
 
-function RequestsListUI({requests}) {
+function RequestsListUI({requests, refetch}) {
     return <ListGroup>
         {requests.map(request =>
             <ListGroupItem key={request.id}>
                 <div className="d-flex flex-row align-items-center">
-                    <div style={{flex: '1'}}>{request.title}</div>
-                    <Button color="success" tag={Link} to={`/new?title=${request.title}`}>
-                        Request
-                    </Button>
+                    <div style={{flex: '1'}}>
+                        <strong>{request.title}</strong>,{' '}
+            requested by {request.email}{' '}
+            on {DateTime
+                .fromISO(request.timestamp)
+                .toLocaleString(DateTime.DATETIME_MED)}
+                    </div>
+                    <DeleteRequestButton request={request} refetch={refetch} />
                 </div>
             </ListGroupItem>
         )}
@@ -108,11 +115,39 @@ function BooksListUI({books}) {
             <ListGroupItem key={book.id}>
                 <div className="d-flex flex-row align-items-center">
                     <div style={{flex: '1'}}>{book.title}</div>
-                    <Button color="success" tag={Link} to={`/new?title=${book.title}`}>
+                    <Button color="success" tag={Link}
+                            to={`/new?${qs.stringify({title: book.title})}`}>
                         Request
                     </Button>
                 </div>
             </ListGroupItem>
         )}
     </ListGroup>;
+}
+
+
+function DeleteRequestButton({request, refetch}) {
+
+    const [deleteRequest, mutationStatus] = useMutation(gql`
+        mutation deleteRequest($id: Int!) {
+            result: deleteRequest(id: $id) {
+                ok
+                errorMessage
+            }
+        }
+    `);
+
+    const { loading } = mutationStatus;
+
+    const onClick = data=>
+        deleteRequest({variables: {id: request.id}})
+            .then(()=> {
+                if (refetch) {
+                    refetch();
+                }
+            });
+
+    return <Button color="danger" disabled={loading} onClick={onClick}>
+        Cancel
+    </Button>;
 }
