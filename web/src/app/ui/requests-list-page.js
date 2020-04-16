@@ -83,6 +83,8 @@ function BooksList() {
             books {
                 id
                 title
+                author
+                coverUrl
             }
         }
     `;
@@ -114,7 +116,10 @@ function BooksListUI({books}) {
         {books.map(book =>
             <ListGroupItem key={book.id}>
                 <div className="d-flex flex-row align-items-center">
-                    <div style={{flex: '1'}}>{book.title}</div>
+                    <div style={{flex: '1'}}>
+                        <img src={book.coverUrl} alt="" style={{height: 40}} />{' '}
+                        <strong>{book.title}</strong> by {book.author}
+                    </div>
                     <Button color="success" tag={Link}
                             to={`/new?${qs.stringify({title: book.title})}`}>
                         Request

@@ -1,4 +1,4 @@
-from app.data.books import BOOKS
+from app.data.books import BooksDB
 from app.db.query.library import BookRequestsDB
 from app.utils.validation import validate_email_address
 
@@ -14,6 +14,7 @@ class LibraryCore(BaseCore):
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)
         self._requests_db = BookRequestsDB()
+        self._books_db = BooksDB()
 
     def get_request(self, id):
 
@@ -60,15 +61,17 @@ class LibraryCore(BaseCore):
         self._requests_db.delete(id=request.id)
 
     def list_books(self, title_prefix=None):
+        books = self._books_db.list()
 
         if title_prefix is not None:
-            title_prefix = title_prefix.lower()
-            return [
-                x for x in BOOKS
-                if x.title.lower().startswith(title_prefix)
-            ]
+            books = (
+                x for x in books
+                if x.title.lower().startswith(title_prefix))
 
-        return BOOKS
+        return books
+
+    def get_book(self, id):
+        return self._books_db.get(id)
 
     # Authorization --------------------------------------------------
 

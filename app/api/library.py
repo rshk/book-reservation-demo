@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 Book = Object('Book', {
     'id': int,
     'title': str,
+    'author': str,
+    'cover_url': str,
 })
 
 
@@ -95,3 +97,9 @@ def resolve_delete_request(root, info, id: int) -> DeleteRequestOutput:
 def resolve_list_books(root, info) -> List[Book]:
     core = LibraryCore.from_request()
     return list(core.list_books())
+
+
+@schema.query.field('book')
+def resolve_get_book(root, info, id: int) -> Book:
+    core = LibraryCore.from_request()
+    return core.get_book(id)
